@@ -18,6 +18,11 @@
 //       eventos é N^3, aonde N é o número de partículas.
 
 // TODO: Crie a struct pq.
+struct pq{
+    Event** eventos;
+    int maxSize;
+    int actualSize;
+};
 
 /*
  * Cria uma nova fila de prioridade mínima com o limite de elementos informado.
@@ -25,6 +30,14 @@
 PQ* PQ_create(int max_N) {
     // TODO: Implemente a criação da fila que suporta no máximo o número de
     //       de eventos informados no parâmetro.
+    PQ* queue = malloc(sizeof(PQ)*max_N*max_N*max_N);
+    queue->actualSize=0;
+    queue->maxSize=max_N*max_N*max_N;
+    for(int i=0;i<queue->maxSize;i++){
+        queue->eventos[i]=NULL;
+    }
+
+    return queue;
 }
 
 /*
@@ -33,6 +46,10 @@ PQ* PQ_create(int max_N) {
 void PQ_destroy(PQ *pq) {
     // TODO: Implemente essa função que libera toda a memória da fila,
     //       destruindo inclusive os eventos que estavam na fila.
+    for(int i=0;i<pq->actualSize;i++){
+        destroy_event(pq->eventos[i]);
+    }
+    free(pq);
 }
 
 /*
@@ -44,6 +61,14 @@ void PQ_insert(PQ *pq, Event *e) {
     //       Assuma que 'e' não é nulo. É importante testar overflow (inserção
     //       em uma fila que já contém o número máximo de eventos) para evitar
     //       dores de cabeça com acessos inválidos na memória.
+    if(pq->actualSize==pq->maxSize){
+        printf("OverFlow error\n");
+        return;
+    }
+
+    pq->actualSize++;
+    pq->eventos[pq->actualSize]=e;
+    //fixup
 }
 
 /*
@@ -52,18 +77,25 @@ void PQ_insert(PQ *pq, Event *e) {
 Event* PQ_delmin(PQ *pq) {
     // TODO: Implemente essa função que remove o evento com o menor tempo da
     //       fila e o retorna.
+    Event* remove = pq->eventos[1];
+    //inverte o ultimo com o primeiro
+    pq->eventos[1]=pq->eventos[pq->actualSize];
+    //fixdown
+    pq->actualSize--;
+
+    return remove;
 }
 
 /*
  * Testa se a fila está vazia.
  */
 bool PQ_is_empty(PQ *pq) {
-    // TODO: Implemente essa função.
+    return pq->actualSize==0;
 }
 
 /*
  * Retorna o tamanho da fila.
  */
 int PQ_size(PQ *pq) {
-    // TODO: Implemente essa função.
+    return pq->actualSize;
 }
